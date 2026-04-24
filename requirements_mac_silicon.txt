@@ -1,0 +1,9 @@
+# Apple Silicon (M1/M2/M3) — Metal GPU acceleration via tensorflow-metal
+tensorflow-macos>=2.12.0
+tensorflow-metal>=0.8.0
+opencv-python>=4.7.0
+numpy>=1.23.0
+pygame>=2.1.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+scikit-learn>=1.2.0

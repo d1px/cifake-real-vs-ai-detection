@@ -1,0 +1,8 @@
+# Windows: use opencv-python-headless to avoid GTK/Qt conflicts with pygame
+tensorflow>=2.12.0
+opencv-python-headless>=4.7.0
+numpy>=1.23.0
+pygame>=2.1.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+scikit-learn>=1.2.0

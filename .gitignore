@@ -1,0 +1,9 @@
+data/
+venv/
+__pycache__/
+*.pyc
+outputs/
+screenshots/
+*.h5
+data_subset/
+*.zip
