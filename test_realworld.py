@@ -1,15 +1,6 @@
-"""
-test_realworld.py — Batch classifier for real-world images.
-
-Loads the trained CIFAKE faces model and classifies every jpg/jpeg/png image
-in a given folder, printing per-image results and a final summary table.
-
-Usage:
-    python test_realworld.py [folder_path]
-
-    folder_path  — optional path to a folder containing images.
-                   Defaults to ./test_images/ if not supplied.
-"""
+# test_realworld.py - test images from a folder
+# loads the faces model and classifies every jpg/png it finds
+# usage: python test_realworld.py [folder_path]  (defaults to ./test_images/)
 
 import os
 import sys
@@ -18,36 +9,29 @@ import cv2
 import numpy as np
 from tensorflow.keras.models import load_model
 
-# ── Configuration ──────────────────────────────────────────────────────────────
+# config
 MODEL_PATH          = os.path.join(os.path.dirname(__file__), "models", "cifake_faces_model.h5")
 DEFAULT_TEST_FOLDER = os.path.join(os.path.dirname(__file__), "test_images")
-IMG_SIZE            = 64       # model input resolution
-FAKE_THRESHOLD      = 0.5     # sigmoid >= 0.5 → REAL
-UNCERTAIN_THRESHOLD = 0.65    # confidence below this → UNCERTAIN
+IMG_SIZE            = 64
+FAKE_THRESHOLD      = 0.5     # sigmoid >= 0.5 means REAL
+UNCERTAIN_THRESHOLD = 0.65    # below this = uncertain
 
 SUPPORTED_EXTENSIONS = {".jpg", ".jpeg", ".png"}
 
 
 def classify_image(model, image_path):
-    """
-    Load, pre-process, and classify a single image.
-
-    Returns:
-        (label, confidence_pct) where label is 'REAL', 'FAKE', or 'UNCERTAIN'
-        and confidence_pct is a float 0–100.
-        Returns (None, None) if the image cannot be loaded.
-    """
+    # returns (label, confidence_pct) or (None, None) if image can't be loaded
     img_bgr = cv2.imread(image_path)
     if img_bgr is None:
         return None, None
 
-    # Pre-process: resize → BGR→RGB → normalise → add batch dim
+    # resize, convert to rgb, normalise
     small      = cv2.resize(img_bgr, (IMG_SIZE, IMG_SIZE))
     small_rgb  = cv2.cvtColor(small, cv2.COLOR_BGR2RGB)
     normalised = small_rgb.astype("float32") / 255.0
     batch      = np.expand_dims(normalised, axis=0)
 
-    # Inference — sigmoid output, class mapping: fake=0, real=1
+    # run the model
     raw_score  = float(model.predict(batch, verbose=0)[0][0])
 
     if raw_score >= FAKE_THRESHOLD:
@@ -68,7 +52,7 @@ def classify_image(model, image_path):
 
 
 def main():
-    # ── Resolve folder path ────────────────────────────────────────────────────
+    # get folder from args or use default
     if len(sys.argv) > 1:
         folder = sys.argv[1]
     else:
@@ -76,14 +60,14 @@ def main():
 
     folder = os.path.abspath(folder)
 
-    # ── Create folder if it does not exist ────────────────────────────────────
+    # create it if it doesn't exist yet
     if not os.path.isdir(folder):
         os.makedirs(folder, exist_ok=True)
         print(f"Created folder: {folder}")
         print("Drop .jpg / .jpeg / .png images into that folder, then re-run.")
         sys.exit(0)
 
-    # ── Collect supported image files ─────────────────────────────────────────
+    # find all image files
     image_files = sorted(
         f for f in os.listdir(folder)
         if os.path.splitext(f)[1].lower() in SUPPORTED_EXTENSIONS
@@ -94,12 +78,12 @@ def main():
         print("Drop images into that folder, then re-run.")
         sys.exit(0)
 
-    # ── Load model ────────────────────────────────────────────────────────────
+    # load model
     print(f"Loading model from '{MODEL_PATH}' ...")
     model = load_model(MODEL_PATH)
     print("Model loaded.\n")
 
-    # ── Classify each image ───────────────────────────────────────────────────
+    # go through each image and classify it
     print(f"{'Filename':<40} {'Prediction':<22} {'Confidence':>10}")
     print("-" * 76)
 
@@ -126,7 +110,7 @@ def main():
 
         print(f"{filename:<40} {label:<22} {conf_pct:>9.1f}%")
 
-    # ── Summary ───────────────────────────────────────────────────────────────
+    # print summary at the end
     total = len(image_files)
     print("-" * 76)
     print(f"\nSummary")

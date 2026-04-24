@@ -1,16 +1,6 @@
 #!/usr/bin/env bash
-# launch_demo.sh — One-command launcher for the CIFAKE real-time detector.
-#
-# What this does:
-#   1. Creates the virtual camera (/dev/video10) if it doesn't exist
-#   2. Starts virtual_camera.py in the background (mirrors real webcam → /dev/video10)
-#   3. Waits 2 seconds for the stream to stabilise
-#   4. Launches start.py (the CIFAKE demo)
-#   5. Cleans up the background mirror process on exit
-#
-# Usage:
-#   bash ~/cifake-project/launch_demo.sh
-#   — or just type: CIFAKE   (if the CIFAKE command is installed)
+# launch_demo.sh - starts the virtual camera then launches the detector
+# usage: bash ~/cifake-project/launch_demo.sh
 
 set -e
 
@@ -19,7 +9,7 @@ VENV_PYTHON="$SCRIPT_DIR/venv/bin/python"
 VIRTUAL_DEVICE="/dev/video10"
 MIRROR_PID=""
 
-# ── Cleanup trap: kill mirror process when the script exits ──────────────────
+# kill mirror process when script exits
 cleanup() {
     if [ -n "$MIRROR_PID" ] && kill -0 "$MIRROR_PID" 2>/dev/null; then
         echo ""
@@ -31,7 +21,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-# ── Step 1: Create virtual camera device if missing ──────────────────────────
+# step 1: create virtual camera if needed
 if [ ! -e "$VIRTUAL_DEVICE" ]; then
     echo "==> Virtual camera not found — running setup_virtual_camera.sh ..."
     bash "$SCRIPT_DIR/setup_virtual_camera.sh"
@@ -39,7 +29,7 @@ else
     echo "==> Virtual camera $VIRTUAL_DEVICE already exists. ✓"
 fi
 
-# ── Step 2: Start virtual_camera.py in the background ───────────────────────
+# step 2: start the mirror in background if not already running
 if pgrep -f "virtual_camera.py" > /dev/null 2>&1; then
     echo "==> virtual_camera.py is already running. ✓"
 else
@@ -49,11 +39,11 @@ else
     echo "    Mirror PID: $MIRROR_PID"
 fi
 
-# ── Step 3: Wait for the stream to start ─────────────────────────────────────
+# step 3: wait a moment for stream to start
 echo "==> Waiting 2 seconds for virtual camera stream to stabilise..."
 sleep 2
 
-# ── Step 4: Launch the CIFAKE demo ───────────────────────────────────────────
+# step 4: launch the detector
 echo "==> Launching CIFAKE detector..."
 echo ""
 cd "$SCRIPT_DIR"

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# setup_virtual_camera.sh — Load v4l2loopback and create /dev/video10
-# Run this once before launching the CIFAKE demo when a video call is active.
-# Requires v4l2loopback-dkms: sudo pacman -S v4l2loopback-dkms linux-headers
+# setup_virtual_camera.sh - loads v4l2loopback and creates /dev/video10
+# run this once before the demo if you're on a video call at the same time
+# needs v4l2loopback-dkms: sudo pacman -S v4l2loopback-dkms linux-headers
 
 set -e
 

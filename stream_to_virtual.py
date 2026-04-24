@@ -1,14 +1,5 @@
-"""
-stream_to_virtual.py — Mirror /dev/video0 → /dev/video10 (v4l2loopback virtual camera).
-
-Reads frames from the real webcam and writes them to the virtual camera device so that
-multiple apps (Microsoft Teams, camera.py) can access the camera simultaneously.
-
-Usage:
-    venv/bin/python stream_to_virtual.py
-
-Stop with Ctrl+C.
-"""
+# stream_to_virtual.py - pipes /dev/video0 into /dev/video10
+# so multiple apps can use the webcam at the same time (e.g. Teams + camera.py)
 
 import cv2
 import pyfakewebcam
@@ -38,6 +29,7 @@ except Exception as e:
     sys.exit(1)
 
 
+# clean up on ctrl+c or kill
 def cleanup(sig, frame):
     print("Stopping stream...")
     cap.release()
@@ -53,5 +45,5 @@ while True:
     ret, frame = cap.read()
     if not ret:
         continue
-    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # pyfakewebcam needs rgb
     camera.schedule_frame(frame_rgb)

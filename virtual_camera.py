@@ -1,22 +1,6 @@
-"""
-virtual_camera.py — Mirror the real webcam to /dev/video10 (v4l2loopback).
-
-This script reads frames from the physical webcam (index 0) and writes them
-to the virtual camera device at /dev/video10 so that TWO applications can
-access the camera at the same time:
-  - Your video call uses /dev/video0  (real webcam)
-  - camera.py uses /dev/video10      (virtual mirror)
-
-Usage:
-    cd ~/cifake-project
-    venv/bin/python virtual_camera.py
-
-Prerequisites:
-    1. Run setup_virtual_camera.sh first to create /dev/video10
-    2. pip install pyfakewebcam  (inside the venv)
-
-Stop with Ctrl+C.
-"""
+# virtual_camera.py - mirrors real webcam to /dev/video10 using pyfakewebcam
+# lets camera.py and a video call use the camera at the same time
+# run setup_virtual_camera.sh first, then this script
 
 import os
 import sys
@@ -27,7 +11,7 @@ VIRTUAL_DEVICE    = "/dev/video10"
 
 
 def main():
-    # ── Check virtual device exists ───────────────────────────────────────────
+    # check the virtual device was created by setup script
     if not os.path.exists(VIRTUAL_DEVICE):
         print(
             f"ERROR: Virtual camera device '{VIRTUAL_DEVICE}' does not exist.\n"
@@ -36,7 +20,7 @@ def main():
         )
         sys.exit(1)
 
-    # ── Import pyfakewebcam (give a clear message if missing) ─────────────────
+    # check pyfakewebcam is installed
     try:
         import pyfakewebcam
     except ImportError:
@@ -47,7 +31,7 @@ def main():
         )
         sys.exit(1)
 
-    # ── Open real webcam ──────────────────────────────────────────────────────
+    # open real webcam
     print(f"Opening real webcam at index {REAL_CAMERA_INDEX} ...")
     cap = cv2.VideoCapture(REAL_CAMERA_INDEX)
     if not cap.isOpened():
@@ -61,7 +45,7 @@ def main():
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     print(f"Webcam resolution: {width}x{height}")
 
-    # ── Open virtual camera for writing ──────────────────────────────────────
+    # open virtual camera
     print(f"Opening virtual camera at {VIRTUAL_DEVICE} ...")
     try:
         camera = pyfakewebcam.FakeWebcam(VIRTUAL_DEVICE, width, height)
@@ -72,14 +56,14 @@ def main():
 
     print(f"✓ Mirroring webcam → {VIRTUAL_DEVICE}  (Ctrl+C to stop)\n")
 
-    # ── Mirror loop ───────────────────────────────────────────────────────────
+    # mirror loop - read from real, write to virtual
     try:
         while True:
             ret, frame_bgr = cap.read()
             if not ret:
                 continue  # drop frame and try again
 
-            # pyfakewebcam expects RGB
+            # pyfakewebcam needs rgb not bgr
             frame_rgb = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB)
             camera.schedule_frame(frame_rgb)
 
