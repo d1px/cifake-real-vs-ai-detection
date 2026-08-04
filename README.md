@@ -77,8 +77,8 @@ flowchart TD
 Clone the repository and run the automated setup wizard:
 
 ```bash
-git clone https://github.com/d1px/cifake-real-vs-ai-detection.git
-cd cifake-real-vs-ai-detection
+git clone https://github.com/d1px/CIFAKE.git
+cd CIFAKE
 
 # Run automated dependency installer for your OS
 python setup.py
