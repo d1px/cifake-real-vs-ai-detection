@@ -145,7 +145,7 @@ python test_realworld.py path/to/image_folder/
 ## 📁 Repository Directory Structure
 
 ```
-cifake-real-vs-ai-detection/
+CIFAKE/
 ├── camera.py                 # Live Pygame HUD & OpenCV camera inference engine
 ├── start.py                  # Cross-platform launcher & environment verifier
 ├── predict.py                # Single image inference CLI script
